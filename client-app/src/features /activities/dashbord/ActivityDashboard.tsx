@@ -3,44 +3,32 @@ import { Activity } from '../../../app/models/activity';
 import ActivityList from './ActivityList';
 import ActivityDetails from '../details/ActivityDetails';
 import ActivityForm from '../form/ActivityForm';
+import { useStore } from '../../../app/store/store';
+import { observer } from 'mobx-react-lite';
+import NavBar from '../../../app/layout/NavBar';
 
 
-interface props {
-    activities: Activity[],
-    selectedActivity: Activity | undefined,
-    handleSelectedActivity: (id:string) => void,
-    handleCancelSelectedActivity: () => void
-    editMode: boolean
-    openForm: (id:string) => void 
-    closeForm: () => void
-    createOrEdit: (activity: Activity) => void
-    deleteActivity: (id: string) => void
-    submitting: boolean
-}
 
-function ActivityDashboard ({activities, selectedActivity,handleSelectedActivity,handleCancelSelectedActivity,
-                            editMode, openForm, closeForm, createOrEdit, deleteActivity, submitting
-}: props) {
+function ActivityDashboard () {
+
+    const {ActivityStore} = useStore();
+    const {selectedActivity, editMode} = ActivityStore
     return (
         <Grid>
+            <NavBar />
             <Grid.Column width='10'>
-              <ActivityList 
-              activities={activities} 
-              handleSelectedActivity={handleSelectedActivity} 
-              deleteActivity={deleteActivity}
-              submitting />
+              <ActivityList
+             
+             />
             </Grid.Column>
             <Grid.Column width={'6'}>
                 {selectedActivity && !editMode &&
-                <ActivityDetails
-                   activity={selectedActivity} 
-                   handleCancelSelectedActivity={handleCancelSelectedActivity}
-                   openForm={openForm}/>}
-                {editMode &&
-                <ActivityForm submitting={submitting} closeForm={closeForm} activity={selectedActivity} createOrEdit={createOrEdit} />}
+                <ActivityDetails />}
+                {ActivityStore.editMode &&
+                <ActivityForm  />}
             </Grid.Column>
         </Grid>
     )
 }
 
-export default ActivityDashboard
+export default observer(ActivityDashboard) 
