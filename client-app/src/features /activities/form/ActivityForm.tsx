@@ -1,25 +1,47 @@
 import { Button, Form, Segment } from "semantic-ui-react";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { useStore } from "../../../app/store/store";
 import { observer } from "mobx-react-lite";
+import { Activity } from "../../../app/models/activity";
+import { NavLink, useNavigate, useParams } from "react-router-dom";
+import LoadingComponent from "../../../app/layout/LoadingComponent";
+import {v4 as uuid} from 'uuid';
+
 
 
 
 
 function ActivityForm () {
     const {ActivityStore} = useStore();
-    const {selectedActivity,createActivity,updateActivity, closeForm} = ActivityStore;
-    const initialState = selectedActivity ?? {
-        id: '',
-        title: '',
-        date:'',
-        description:'',
-        category:'',
-        city:'',
-        venue:'',
-    }
+    const {createActivity,updateActivity, loadActivity, loadingInitial} = ActivityStore;
+    const {id} = useParams();
+    const navigate = useNavigate();
     
-const [activity,setActivity] = useState(initialState)
+   const [activity, setActivity] = useState<Activity>({
+    id: '',
+    title: '',
+    category: '',
+    description: '',
+    date: '',
+    city: '',
+    venue:''
+   });
+
+useEffect(() => {
+    if(id) loadActivity(id).then((activity)=> setActivity(activity!));
+}, [id, loadActivity])
+
+
+function handleSubmit () {
+
+if(!activity.id){
+    activity.id = uuid()
+    createActivity(activity).then(() => navigate(`/activities/${activity.id}`))
+ }else{
+    updateActivity(activity).then(() => navigate(`/activities/${activity.id}`))
+ }
+}
+ 
 
 function handleFormChange(event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>) {
 
@@ -28,14 +50,12 @@ function handleFormChange(event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTM
      setActivity({...activity,[name] : value});
 }
 
-function handleSubmit () {
-   if(activity.id) {
-    updateActivity(activity);
-   } else{
-    createActivity(activity);
-   }
-}
+// function handleCancel () {
+//     navigate('/activities')
+// }
 
+ 
+ if(loadingInitial) return <LoadingComponent content="Loading" />
 
 
     return (
@@ -48,10 +68,11 @@ function handleSubmit () {
                <Form.Input placeholder='City' value={activity.city} name='city'onChange={handleFormChange}/>
                <Form.Input placeholder='Venue' value={activity.venue} name='venue' onChange={handleFormChange}/>
                <Button  loading={ActivityStore.loading} floated='right' positive type='submit' content='Submite' />
-               <Button onClick={closeForm} floated='right'  type='button' content='Cancel' />
+               <Button as={NavLink} to={'/activities'} floated='right'  type='button' content='Cancel' />
             </Form>
         </Segment>
     )
 }
 
 export default observer(ActivityForm)
+
