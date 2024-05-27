@@ -5,6 +5,7 @@ import { observer } from 'mobx-react-lite';
 import NavBar from '../../../app/layout/NavBar';
 import { useEffect } from 'react';
 import LoadingComponent from '../../../app/layout/LoadingComponent';
+import ActivityFilters from './ActivityFilters';
 
 
 
@@ -24,13 +25,13 @@ useEffect(() =>{
     return (
         <Grid>
             <NavBar />
-            <Grid.Column width='10'>
+            <Grid.Column width={'10'} >
               <ActivityList
              
              />
             </Grid.Column>
             <Grid.Column width={'6'}>
-               <h2>Actvity filters</h2>
+               <ActivityFilters />
             </Grid.Column>
         </Grid>
     )
